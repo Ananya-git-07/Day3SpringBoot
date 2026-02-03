@@ -1,41 +1,48 @@
-package com.example.day3studentmanagementsystem.Service;
+package com.example.day3studentmanagementsystem.Controller;
 
+import com.example.day3studentmanagementsystem.DTO.StudentRequestDto;
+import com.example.day3studentmanagementsystem.DTO.StudentResponseDto;
 import com.example.day3studentmanagementsystem.Model.StudentModel;
-import com.example.day3studentmanagementsystem.Repository.StudentRepository;
-import org.springframework.stereotype.Service;
+import com.example.day3studentmanagementsystem.Service.StudentService;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Service
-public class StudentService {
-    private final StudentRepository repository;
-    public StudentService(StudentRepository repository) {
-        this.repository = repository;
+@RestController
+public class StudentController {
+    private final StudentService service;
+    public StudentController(StudentService service){
+        this.service = service;
     }
-    public StudentModel addStudent(StudentModel student){
-        return repository.save(student);
-    }
-    //Display Students
-    public List<StudentModel> getStudents(){
-        return repository.findAll();
+    @PostMapping("/add-student")
+//    public StudentModel addStudent(@RequestBody StudentModel student){
+//        return service.addStudent(student);
+//    }
+    public StudentResponseDto addStudent(@Valid @RequestBody StudentRequestDto student){
+        return service.addStudent(student);
+     }
+
+    @GetMapping("/students")
+//    public List<StudentModel> getStudents(){
+//        return service.getStudents();
+//    }
+    public List<StudentResponseDto> getStudents(){
+        return service.getStudents();
     }
 
-    public StudentModel getStudent(String id){
-        return repository.findById(id).orElseThrow(()-> new RuntimeException("No student found"));
+//    @GetMapping("/student/{id}")
+//    public StudentModel getStudent(@PathVariable String id){
+//        return service.getStudents(id);
+//    }
+
+    @DeleteMapping("/student/{id}")
+    public void deleteModel(@PathVariable String id){
+        service.deleteModel(id);
     }
 
-    public void deleteModel(String id){
-        repository.deleteById(id);
-    }
-
-    //update
-    public StudentModel updateStudent(String id,StudentModel student){
-        StudentModel existingStudent=repository.findById(id).orElseThrow(()-> new RuntimeException("No student found"));
-
-        existingStudent.setName(student.getName());
-        existingStudent.setAge(student.getAge());
-        existingStudent.setEmail(student.getEmail());
-
-        return repository.save(existingStudent);
+    @PutMapping("/update/{id}")
+    public StudentResponseDto updateStudent(@PathVariable String id,@Valid @RequestBody StudentRequestDto student){
+        return service.updateStudent(id,student);
     }
 }
